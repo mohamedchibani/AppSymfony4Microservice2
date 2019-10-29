@@ -10,6 +10,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert; 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
+
+use App\Controller\ResetPasswordAction;
 
 
 /**
@@ -22,6 +25,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *                   "groups" = {"get"}
  *              }
  *          },
+ * 
  *          "PUT" = {
  *              "access_control" = "is_granted('IS_AUTHENTICATED_FULLY') and object == user",
  *              "denormalization_context" = {
@@ -31,8 +35,20 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *                   "groups" = {"get"}
  *              }
  *          },
+ *          
+ *          "put-reset-password"= {
+ *              "access_control" = "is_granted('IS_AUTHENTICATED_FULLY') and object == user",
+ *              "method" = "PUT",
+ *              "path" = "/users/{id}/reset-password",
+ *              "controller" = ResetPasswordAction::class,
+ *              "denormalization_context" = {
+ *                   "groups" = {"put-reset-password"}
+ *              }, 
+ *           },
  * 
- *          "DELETE"
+ *          "DELETE" = {
+ *              "access_control" = "is_granted('ROLE_SUPERADMIN')"
+ *          }
  *     },
  *     
  *     collectionOperations={"GET",
@@ -75,40 +91,64 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"get","post","get-comment-with-author","get-post-with-author"})
-     * @Assert\NotBlank()
-     * @Assert\Regex(pattern="/^[a-z]+$/i", message="Ce message ne respecte pas le pattern")
-     * @Assert\Length(min=5, max=20, minMessage="Ce champs doit comporte au moins {{ limit }} chars", maxMessage="Ce champs ne doit pas dépasser {{ limit }} chars")
+     * @Assert\NotBlank(groups={"post"})
+     * @Assert\Regex(pattern="/^[a-z]+$/i", message="Ce message ne respecte pas le pattern", groups={"post"})
+     * @Assert\Length(min=5, max=20, minMessage="Ce champs doit comporte au moins {{ limit }} chars", maxMessage="Ce champs ne doit pas dépasser {{ limit }} chars", groups={"post"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"post","put"})
+     * @Groups({"post"})
      */
     private $password;
 
     /**
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(groups={"post"})
      * @Assert\Expression(
      *      "this.getPassword() === this.getRetypedPassword()",
-     *      message="Password does not matched"
+     *      message="Password does not matched",
+     *      groups={"post"}
      * )
-     * @Groups({"post","put"})
+     * @Groups({"post"})
      */
     private $retypedPassword;
 
     /**
+     * @Assert\NotBlank(groups={"post"})
+     * @Groups({"put-reset-password"})
+     */
+    private $newPassword;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Expression(
+     *      "this.getNewPassword() === this.getNewRetypedPassword()",
+     *      message="Password does not matched"
+     * )
+     * @Groups({"put-reset-password"})
+     */
+    private $newRetypedPassword;
+
+     /**
+     * @Assert\NotBlank()
+     * @UserPassword()
+     * @Groups({"put-reset-password"})
+     */
+    private $oldPassword;
+
+    /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"post","get","put","get-comment-with-author","get-post-with-author"})
-     * @Assert\NotBlank(message="ce champs est oblogatoire")
+     * @Assert\NotBlank(message="ce champs est oblogatoire", groups={"post", "put"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"post","put","get-post-with-author"})
-     * @Assert\NotBlank()
-     * @Assert\Email()
+     * @Assert\NotBlank(groups={"post", "put"})
+     * @Assert\Email(groups={"post", "put"})
      */
     private $email;
 
@@ -306,5 +346,49 @@ class User implements UserInterface
 
         return $this;
     }
+
+
+
+    public function getNewPassword(): ?string{
+        return $this->newPassword;
+    }
+
+    
+    public function setNewPassword(string $newPassword): self
+    {
+        $this->newPassword = $newPassword;
+
+        return $this;
+    }
+
+
+
+    public function getNewRetypedPassword(): ?string{
+        return $this->newRetypedPassword;
+    }
+
+
+    public function setNewRetypedPassword(string $newRetypedPassword): self
+    {
+        $this->newRetypedPassword = $newRetypedPassword;
+
+        return $this;
+    }
+
+
+
+    public function getOldPassword(): ?string{
+        return $this->oldPassword;
+    }
+
+
+    public function setOldPassword(string $oldPassword): self
+    {
+        $this->oldPassword = $oldPassword;
+
+        return $this;
+    }
+
+
 
 }

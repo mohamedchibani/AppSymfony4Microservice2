@@ -25,7 +25,7 @@ class UserPasswordSubscriber implements EventSubscriberInterface
         $entity = $event->getControllerResult();// resultat (objet) d'une méthode executé dans le contrôleur
         $method = $event->getRequest()->getMethod(); // la méthode http utilisée
 
-        if($entity instanceof User && ($method == Request::METHOD_POST || $method == Request::METHOD_PUT)){
+        if($entity instanceof User && ($method == Request::METHOD_POST)){
             $entity->setPassword($this->passwordEncoder->encodePassword(
                 $entity,
                 $entity->getPassword()

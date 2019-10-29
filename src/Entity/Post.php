@@ -22,13 +22,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *              }
  *          },
  *          "PUT" = {
- *              "access_control" = "is_granted('IS_AUTHENTICATED_FULLY') and object.getAuthor() == user"
+ *              "access_control" = "is_granted('ROLE_EDITOR') OR (is_granted('ROLE_WRITER') and object.getAuthor() == user)"
  *          }
  *     },
  *     collectionOperations={
  *          "GET", 
  *          "POST" = {
- *              "access_control" = "is_granted('IS_AUTHENTICATED_FULLY')"
+ *              "access_control" = "is_granted('ROLE_WRITER')"
  *          }
  *      
  *     }

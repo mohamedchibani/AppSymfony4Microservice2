@@ -2,12 +2,14 @@
 
 namespace App\Controller;
  
-use ApiPlatform\Core\Validator\ValidatorInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
-
 use App\Entity\User;
 
+
+use Doctrine\ORM\EntityManagerInterface;
+use ApiPlatform\Core\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 
 class ResetPasswordAction {
@@ -27,6 +29,7 @@ class ResetPasswordAction {
         $this->validator = $validator;
         $this->userPasswordEncoder = $userPasswordEncoder;
         $this->entityManager = $entityManager;
+        $this->tokenManager = $tokenManager;
     }
     
     public function __invoke(User $data)

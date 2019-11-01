@@ -7,16 +7,23 @@ use Doctrine\ORM\Mapping as ORM;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Controller\UploadImageAction;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource(
+ * 
+ *  attributes={
+ *      "formats" = {"json", "jsonld", "form" = {"multipart/form-data"}}
+ *  },
  *      
  *  collectionOperations={
  *      "get",
  *      "post"={
  *          "method" = "POST",
  *          "path" = "/images",
- *          "controller" = UploadImageAction::class
+ *          "controller" = UploadImageAction::class,
+ *          "defaults" = {"_api_receive"=false}
  *       }
  *  }    
  *  
@@ -31,17 +38,20 @@ class Image
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"get-comment-with-author"})
      */
     private $id;
 
     /**
      * @Vich\UploadableField(mapping="images", fileNameProperty="url")
      * @Assert\NotNull()
+     * 
      */
     private $file;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"get-comment-with-author"})
      */
     private $url;
 

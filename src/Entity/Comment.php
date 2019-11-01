@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * 
  *     subresourceOperations={
  *       "api_posts_comments_get_subresource"={
- *              "normalization_context" = {
+ *              "normalization-context" = {
  *                   "groups" = {"get-comment-with-author"}
  *              }
  *        }

@@ -3,11 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Image;
+use App\Form\ImageType;
+
 use Doctrine\ORM\EntityManagerInterface;
-
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\FormFactoryInterface;
 
+use Symfony\Component\Form\FormFactoryInterface;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 
@@ -21,6 +22,7 @@ class UploadImageAction{
         FormFactoryInterface $formFacory,
         EntityManagerInterface $entityManager,
         ValidatorInterface $validator
+    
         )
     {
         $this->formFacory = $formFacory;
@@ -35,13 +37,14 @@ class UploadImageAction{
         $image = new Image();
 
         // Validate the form
-        $form = $this->formFacory->create(null, $image);
+        $form = $this->formFacory->create(ImageType::class, $image);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
             $this->entityManager->persist($image);
             $this->entityManager->flush();
 
+            $image->setFile(null);
             return $image;
         }
 

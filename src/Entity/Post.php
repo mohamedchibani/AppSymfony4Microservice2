@@ -17,12 +17,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *     itemOperations={
  *          "GET" = {
- *              "normalization_context" = {
+ *              "normalization-context" = {
  *                   "groups" = {"get-post-with-author"}
  *              }
  *          },
  *          "PUT" = {
- *              "access_control" = "is_granted('ROLE_EDITOR') OR (is_granted('ROLE_WRITER') and object.getAuthor() == user)"
+ *              "access_control" = "is_granted('ROLE_EDITOR') || (is_granted('ROLE_WRITER') and object.getAuthor() == user)"
  *          }
  *     },
  *     collectionOperations={
@@ -87,9 +87,18 @@ class Post
      */
     private $comments;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Image")
+     * @ORM\JoinTable()
+     * Groups({"post","get-post-with-author"})
+     * @ApiSubresource()
+     */
+    private $images;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
 
@@ -186,6 +195,32 @@ class Post
             if ($comment->getPost() === $this) {
                 $comment->setPost(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Image[]
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images[] = $image;
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): self
+    {
+        if ($this->images->contains($image)) {
+            $this->images->removeElement($image);
         }
 
         return $this;

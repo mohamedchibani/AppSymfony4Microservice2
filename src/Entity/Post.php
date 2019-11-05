@@ -2,22 +2,65 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
+
 
 
 /**
+ * @ApiFilter(PropertyFilter::class,
+ *      arguments={
+ *          "parameterName" : "properties",
+ *          "overrideDefaultProperties": false,
+ *          "whitelist": {"id", "title", "author", "slug", "content"}    
+ *      }
+ * )
+ * 
+ * @ApiFilter(OrderFilter::class, 
+ *      properties={"id", "title", "published"}, 
+ *      arguments={"orderParameterName"="_order"}
+ * )
+ * 
+ * @ApiFilter(SearchFilter::class, properties={
+ *      "id" : "exact",
+ *      "title" : "partial",
+ *      "content" : "partial",
+ *      "author" : "exact",
+ *      "authot.name" : "partial"
+ * }),
+ * 
+ * @ApiFilter(DateFilter::class, properties={
+ *      "published"
+ * }), 
+ * 
+ * @ApiFilter(RangeFilter::class, properties={"id"}),
+ * 
+ * 
+ * 
  * @ApiResource(
+ *     
+ *     attributes={
+ *          "order" = {"author": "DESC", "title": "ASC"}
+ *     },  
+ *     
  *     itemOperations={
  *          "GET" = {
- *              "normalization-context" = {
+ *              "normalization_context" = {
  *                   "groups" = {"get-post-with-author"}
  *              }
  *          },
@@ -90,7 +133,7 @@ class Post
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Image")
      * @ORM\JoinTable()
-     * Groups({"post","get-post-with-author"})
+     * @Groups({"post","get-post-with-author"})
      * @ApiSubresource()
      */
     private $images;

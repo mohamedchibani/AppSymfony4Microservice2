@@ -14,7 +14,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ApiResource(
  * 
  *  attributes={
- *      "formats" = {"json", "jsonld", "form" = {"multipart/form-data"}}
+ *      "formats" = {"json", "jsonld", "form" = {"multipart/form-data"}},
+ *      "order" = {"id": "DESC"}
  *  },
  *      
  *  collectionOperations={
@@ -38,7 +39,7 @@ class Image
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"get-comment-with-author"})
+     * @Groups({"get-post-with-author"})
      */
     private $id;
 
@@ -51,7 +52,7 @@ class Image
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"get-comment-with-author"})
+     * @Groups({"get-post-with-author"})
      */
     private $url;
 

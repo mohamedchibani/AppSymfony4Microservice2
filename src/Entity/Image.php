@@ -68,7 +68,7 @@ class Image
 
     public function getUrl(): ?string
     {
-        return $this->url;
+        return '/images/'.$this->url;
     }
 
     public function setUrl(?string $url): self
@@ -100,5 +100,10 @@ class Image
         $this->file = $file;
 
         return $this;
+    }
+
+    public function __toString():string
+    {
+        return $this->id. ':' . $this->url;
     }
 }

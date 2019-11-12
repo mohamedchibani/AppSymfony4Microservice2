@@ -55,7 +55,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * @ApiResource(
  *     
  *     attributes={
- *          "order" = {"author": "DESC", "title": "ASC"}
+ *          "order" = {"author": "DESC", "title": "ASC"},
+ *          "pagination_client_enabled"= true,
+ *          "pagination_enabled_parameter_name" = "pagination",
+ *          "pagination_items_per_page" = 4
  *     },  
  *     
  *     itemOperations={
@@ -267,5 +270,10 @@ class Post
         }
 
         return $this;
+    }
+
+    public function __toString():string
+    {
+        return $this->title;
     }
 }
